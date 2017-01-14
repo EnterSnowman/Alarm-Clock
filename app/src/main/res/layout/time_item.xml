@@ -5,11 +5,18 @@
 <CheckBox
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/isAlarmOn"/>
+    android:id="@+id/isAlarmOn" />
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/timeOfAlarm"
+        android:layout_weight="0.4"
         android:text="12:00"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_delete"
+        android:layout_weight="1"
+        android:id="@+id/deleteAlarm"/>
 
 </LinearLayout>

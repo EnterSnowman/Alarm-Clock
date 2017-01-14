@@ -1,7 +1,10 @@
 package com.entersnowman.alarmclock;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -27,6 +30,8 @@ public class ListOfTimesActivity extends AppCompatActivity {
     ArrayList<Alarm> alarms;
     RecyclerView recyclerView;
     TimesAdapter timesAdapter;
+    AlarmManager alarmManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +56,9 @@ public class ListOfTimesActivity extends AppCompatActivity {
                 showDialog(TIME_DIALOG);
             }
         });
-        timesAdapter = new TimesAdapter(alarms);
+        timesAdapter = new TimesAdapter(alarms,this);
         recyclerView.setAdapter(timesAdapter);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     protected Dialog onCreateDialog(int id){
@@ -68,6 +74,13 @@ public class ListOfTimesActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(Integer.toString(hourOfDay)+":"+Integer.toString(minute),true);
             editor.commit();
+            Intent intent  = new Intent(ListOfTimesActivity.this,AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(ListOfTimesActivity.this,0,intent,0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()-60*1000,AlarmManager.INTERVAL_DAY,pendingIntent);
             alarms = new ArrayList<Alarm>();
             Map<String,Boolean> tmp = (Map<String, Boolean>) sharedPreferences.getAll();
             for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
