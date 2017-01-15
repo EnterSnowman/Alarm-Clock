@@ -49,13 +49,6 @@ public class ListOfTimesActivity extends AppCompatActivity {
             alarms.add(new Alarm(entry.getValue(),Integer.valueOf(entry.getKey().split(":")[0]),Integer.valueOf(entry.getKey().split(":")[1])));
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog(TIME_DIALOG);
-            }
-        });
         timesAdapter = new TimesAdapter(alarms,this);
         recyclerView.setAdapter(timesAdapter);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -106,7 +99,8 @@ public class ListOfTimesActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.add_alarm) {
+            showDialog(TIME_DIALOG);
             return true;
         }
 
