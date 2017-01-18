@@ -52,6 +52,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
         timesAdapter = new TimesAdapter(alarms,this);
         recyclerView.setAdapter(timesAdapter);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
     }
 
     protected Dialog onCreateDialog(int id){
@@ -68,6 +69,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
             editor.putBoolean(Integer.toString(hourOfDay)+":"+Integer.toString(minute),true);
             editor.commit();
             Intent intent  = new Intent(ListOfTimesActivity.this,AlarmReceiver.class);
+            intent.setAction(Integer.toString(hourOfDay)+":"+Integer.toString(minute));
             PendingIntent pendingIntent = PendingIntent.getBroadcast(ListOfTimesActivity.this,0,intent,0);
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
@@ -101,6 +103,11 @@ public class ListOfTimesActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_alarm) {
             showDialog(TIME_DIALOG);
+            return true;
+        }
+        if (id == R.id.music_settings){
+            Intent intent = new Intent(this,MusicSettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 

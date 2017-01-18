@@ -8,4 +8,10 @@
         android:title="Add alarm"
         android:icon="@mipmap/ic_alarm_plus"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/music_settings"
+        android:orderInCategory="101"
+        android:icon="@mipmap/ic_music_circle"
+        android:title="Music settings"
+        app:showAsAction="always" />
 </menu>
