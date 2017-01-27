@@ -27,6 +27,7 @@ import java.util.Map;
 public class ListOfTimesActivity extends AppCompatActivity {
     final  static int TIME_DIALOG = 1;
     SharedPreferences sharedPreferences;
+    SharedPreferences musicPreferences;
     ArrayList<Alarm> alarms;
     RecyclerView recyclerView;
     TimesAdapter timesAdapter;
@@ -44,6 +45,12 @@ public class ListOfTimesActivity extends AppCompatActivity {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
         sharedPreferences = getSharedPreferences("listOfAlarms",MODE_PRIVATE);
+        musicPreferences = getSharedPreferences("listOfMusicPreferences",MODE_PRIVATE);
+        if (!musicPreferences.contains("typeOfRingtone")){
+            SharedPreferences.Editor editor = musicPreferences.edit();
+            editor.putString("typeOfRingtone","default");
+            editor.commit();
+        }
         Map<String,Boolean> tmp = (Map<String, Boolean>) sharedPreferences.getAll();
         for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
             alarms.add(new Alarm(entry.getValue(),Integer.valueOf(entry.getKey().split(":")[0]),Integer.valueOf(entry.getKey().split(":")[1])));

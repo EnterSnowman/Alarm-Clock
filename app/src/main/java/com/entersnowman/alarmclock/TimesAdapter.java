@@ -63,6 +63,7 @@ public class TimesAdapter extends RecyclerView.Adapter<TimesAdapter.TimeHolder> 
                 notifyDataSetChanged();
             }
         });
+
     }
 
     @Override

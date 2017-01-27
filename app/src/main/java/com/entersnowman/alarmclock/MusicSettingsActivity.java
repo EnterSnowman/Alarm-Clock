@@ -1,5 +1,7 @@
 package com.entersnowman.alarmclock;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -8,71 +10,62 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MusicSettingsActivity extends AppCompatActivity {
     Button otherRingtonesButton;
+    RadioGroup typeOfRingtone;
+    RadioButton defaultRingtone;
+    RadioButton otherRingtone;
+    SharedPreferences musicPreferences;
+    public final static int LIST_OF_RINGTONES = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_settings);
+        musicPreferences = getSharedPreferences("listOfMusicPreferences",MODE_PRIVATE);
         otherRingtonesButton = (Button) findViewById(R.id.setRingtoneButton);
         otherRingtonesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                scanDeviceForMpFiles();
+                startActivityForResult(new Intent(MusicSettingsActivity.this, ListOfRingtonesActivity.class),LIST_OF_RINGTONES);
             }
         });
-    }
-
-    private List<String> scanDeviceForMpFiles(){
-        String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
-        String[] projection = {
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DURATION
-        };
-        final String sortOrder = MediaStore.Audio.AudioColumns.TITLE + " COLLATE LOCALIZED ASC";
-        List<String> mp3Files = new ArrayList<>();
-
-        Cursor cursor = null;
-        try {
-            Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            cursor = getContentResolver().query(uri, projection, selection, null, sortOrder);
-            if( cursor != null){
-                cursor.moveToFirst();
-
-                while( !cursor.isAfterLast() ){
-                    String title = cursor.getString(0);
-                    String artist = cursor.getString(1);
-                    String path = cursor.getString(2);
-                    String displayName  = cursor.getString(3);
-                    String songDuration = cursor.getString(4);
-                    cursor.moveToNext();
-                    if(path != null && path.endsWith(".mp3")) {
-                        mp3Files.add(path);
-                    }
+        typeOfRingtone= (RadioGroup) findViewById(R.id.typeOfRingtoneRadioGroup);
+        typeOfRingtone.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case  R.id.defaultRingtone:
+                    musicPreferences.edit().putString("typeOfRingtone","default").commit();
+                        break;
+                    case R.id.otherRingtone:
+                        musicPreferences.edit().putString("typeOfRingtone","other").commit();
+                        break;
                 }
-
             }
-
-            // print to see list of mp3 files
-            for( String file : mp3Files) {
-                Log.i("TAG", file);
-            }
-
-        } catch (Exception e) {
-            Log.e("TAG", e.toString());
-        }finally{
-            if( cursor != null){
-                cursor.close();
-            }
+        });
+        if (musicPreferences.getString("typeOfRingtone","default").equals("default")){
+            RadioButton radioButton = (RadioButton) findViewById(R.id.defaultRingtone);
+            musicPreferences.edit().putString("typeOfRingtone","default").commit();
+            radioButton.setChecked(true);
         }
-        return mp3Files;
+        else {
+            RadioButton radioButton = (RadioButton) findViewById(R.id.otherRingtone);
+            musicPreferences.edit().putString("typeOfRingtone","other").commit();
+            radioButton.setChecked(true);
+        }
+
     }
 
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

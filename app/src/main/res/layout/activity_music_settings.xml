@@ -21,10 +21,12 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/defaultRingtone"
             android:text="Default"/>
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/otherRingtone"
             android:text="Other..."/>
     </RadioGroup>
     <Button
