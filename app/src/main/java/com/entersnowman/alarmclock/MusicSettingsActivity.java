@@ -42,9 +42,11 @@ public class MusicSettingsActivity extends AppCompatActivity {
                 switch (i){
                     case  R.id.defaultRingtone:
                     musicPreferences.edit().putString("typeOfRingtone","default").commit();
+                        otherRingtonesButton.setEnabled(false);
                         break;
                     case R.id.otherRingtone:
                         musicPreferences.edit().putString("typeOfRingtone","other").commit();
+                        otherRingtonesButton.setEnabled(true);
                         break;
                 }
             }
@@ -52,6 +54,7 @@ public class MusicSettingsActivity extends AppCompatActivity {
         if (musicPreferences.getString("typeOfRingtone","default").equals("default")){
             RadioButton radioButton = (RadioButton) findViewById(R.id.defaultRingtone);
             musicPreferences.edit().putString("typeOfRingtone","default").commit();
+            otherRingtonesButton.setEnabled(false);
             radioButton.setChecked(true);
         }
         else {
@@ -67,5 +70,10 @@ public class MusicSettingsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode==RESULT_OK){
+            musicPreferences.edit().putString("ringtonePath",data.getStringExtra("path"))
+                    .putString("ringtoneName",data.getStringExtra("name"))
+                    .putString("ringtoneAuthor",data.getStringExtra("author")).commit();
+        }
     }
 }

@@ -40,7 +40,7 @@ public class RingtoneAdapter extends RecyclerView.Adapter<RingtoneAdapter.Ringto
             public void onClick(View view) {
                 Intent newIntent = new Intent();
                 newIntent.putExtra("name",tracks.get(position).getName());
-                newIntent.putExtra("title",tracks.get(position).getAuthor());
+                newIntent.putExtra("author",tracks.get(position).getAuthor());
                 newIntent.putExtra("path",tracks.get(position).getPath());
                 activity.setResult(Activity.RESULT_OK,newIntent);
                 activity.finish();
