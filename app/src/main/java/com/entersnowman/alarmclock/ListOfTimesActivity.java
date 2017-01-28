@@ -51,6 +51,11 @@ public class ListOfTimesActivity extends AppCompatActivity {
             editor.putString("typeOfRingtone","default");
             editor.commit();
         }
+        if (!musicPreferences.contains("isOtherRingtone")) {
+            SharedPreferences.Editor editor = musicPreferences.edit();
+            editor.putBoolean("isOtherRingtone",false);
+            editor.commit();
+        }
         Map<String,Boolean> tmp = (Map<String, Boolean>) sharedPreferences.getAll();
         for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
             alarms.add(new Alarm(entry.getValue(),Integer.valueOf(entry.getKey().split(":")[0]),Integer.valueOf(entry.getKey().split(":")[1])));
