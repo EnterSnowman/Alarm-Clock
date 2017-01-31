@@ -2,11 +2,10 @@ package com.entersnowman.alarmclock;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,25 +15,30 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
+import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
+import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class MusicSettingsActivity extends AppCompatActivity {
     Button otherRingtonesButton;
     RadioGroup typeOfRingtone;
-    RadioButton defaultRingtone;
-    RadioButton otherRingtone;
     SharedPreferences musicPreferences;
+    CrystalRangeSeekbar crystalRangeSeekbar;
+    int mediaPlayerDuration;
+    int correctDuration;
     boolean isPause;
     TextView nameOfTrack;
     TextView labelAudio;
+    TextView leftRange;
+    TextView rightRange;
     ImageButton startBtn;
     ImageButton pauseBtn;
     ImageButton stopBtn;
     public final static int LIST_OF_RINGTONES = 1;
     MediaPlayer mediaPlayer;
+    int startSeekBar;
+    int endSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,32 +46,52 @@ public class MusicSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_settings);
         musicPreferences = getSharedPreferences("listOfMusicPreferences",MODE_PRIVATE);
         otherRingtonesButton = (Button) findViewById(R.id.setRingtoneButton);
+        leftRange = (TextView) findViewById(R.id.leftRange);
+        rightRange = (TextView) findViewById(R.id.rightRange);
+        startSeekBar = musicPreferences.getInt("startSeekBar",0);
+        endSeekBar = musicPreferences.getInt("endSeekBar",1000);
+        Log.d("music","startSeekBar = "+startSeekBar+" , "+"endSeekBar = "+endSeekBar);
+        crystalRangeSeekbar = (CrystalRangeSeekbar) findViewById(R.id.rangeOfPlaying);
+        crystalRangeSeekbar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener() {
+            @Override
+            public void valueChanged(Number minValue, Number maxValue) {
+                Log.d("music","value changed "+ millisToMinutesAndSeconds(minValue.intValue())+" "+millisToMinutesAndSeconds(maxValue.intValue()));
+                leftRange.setText( millisToMinutesAndSeconds(minValue.intValue()));
+                rightRange.setText(millisToMinutesAndSeconds(maxValue.intValue()));
+                musicPreferences.edit().putInt("start",(int)(((float)minValue.intValue()/correctDuration)*mediaPlayerDuration))
+                        .putInt("end",(int)(((float)maxValue.intValue()/correctDuration)*mediaPlayerDuration))
+                        .putInt("startSeekBar",minValue.intValue())
+                        .putInt("endSeekBar",maxValue.intValue())
+                        .commit();
+            }
+        });
         createMediaPlayer();
+        setRangesOfSeekBar();
+        //crystalRangeSeekbar.setMinStartValue(2000).setMaxStartValue(5000).apply();
+        Log.d("music", String.valueOf(mediaPlayer.getDuration()));
         isPause = false;
         startBtn = (ImageButton) findViewById(R.id.start);
         stopBtn = (ImageButton) findViewById(R.id.stop);
         pauseBtn = (ImageButton) findViewById(R.id.pause);
+
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 start();
             }
         });
-
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 pause();
             }
         });
-
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 stop();
             }
         });
-
         otherRingtonesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,6 +149,8 @@ public class MusicSettingsActivity extends AppCompatActivity {
 
     }
 
+
+
     public void start(){
         if (isPause){
             mediaPlayer.start();
@@ -161,6 +187,8 @@ public class MusicSettingsActivity extends AppCompatActivity {
         if (!musicPreferences.getBoolean("isOtherRingtone",false))
             mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
         else{
+            if (mediaPlayer!=null)
+            mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
             try {
                 mediaPlayer.setDataSource(this, Uri.parse(musicPreferences.getString("ringtonePath","")));
@@ -184,6 +212,8 @@ public class MusicSettingsActivity extends AppCompatActivity {
             labelAudio.setEnabled(true);
             mediaPlayer.release();
             createMediaPlayer();
+            setRangesOfSeekBar();
+
         }
         if (resultCode == RESULT_CANCELED) {
             if (!musicPreferences.getBoolean("isOtherRingtone",false)){
@@ -191,5 +221,36 @@ public class MusicSettingsActivity extends AppCompatActivity {
                 radioButton.setChecked(true);
             }
         }
+    }
+
+    public String millisToMinutesAndSeconds(int millis){
+        int seconds = (int) (millis / 1000) % 60 ;
+        int minutes = (int) ((millis / (1000*60)) % 60);
+        String zero;
+        if (seconds < 10)
+            zero ="0";
+        else
+            zero  ="";
+        return Integer.toString(minutes)+":"+zero+Integer.toString(seconds);
+    }
+
+    public void setRangesOfSeekBar(){
+        Log.d("music","setRanges");
+        Uri uri = Uri.parse(musicPreferences.getString("ringtonePath",""));
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(getApplicationContext(),uri);
+        String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        int millSecond = Integer.parseInt(durationStr);
+        mediaPlayerDuration = mediaPlayer.getDuration();
+        correctDuration =millSecond;
+        Log.d("music","Dur = "+ String.valueOf(millSecond));
+        Log.d("music","setMinMax");
+        crystalRangeSeekbar.setMinValue(0);
+        crystalRangeSeekbar.setMaxValue(millSecond);
+        Log.d("music","setSelectedMinMax");
+        crystalRangeSeekbar.setMinStartValue(startSeekBar).setMaxStartValue(endSeekBar).apply();
+        leftRange.setText( millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMinValue().intValue()));
+        rightRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMaxValue().intValue()));
+
     }
 }
