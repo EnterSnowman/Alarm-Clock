@@ -31,8 +31,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".AlarmActivity" />
-        <activity android:name=".MusicSettingsActivity" />
-        <activity android:name=".ListOfRingtonesActivity"></activity>
+        <activity android:name=".MusicSettingsActivity"
+            android:label="@string/ringtone_settings"/>
+        <activity android:name=".ListOfRingtonesActivity"
+            android:label="@string/choose_ringtone"></activity>
     </application>
 
 </manifest>

@@ -67,7 +67,6 @@ public class MusicSettingsActivity extends AppCompatActivity {
         });
         createMediaPlayer();
         setRangesOfSeekBar();
-        //crystalRangeSeekbar.setMinStartValue(2000).setMaxStartValue(5000).apply();
         Log.d("music", String.valueOf(mediaPlayer.getDuration()));
         isPause = false;
         startBtn = (ImageButton) findViewById(R.id.start);
@@ -211,7 +210,15 @@ public class MusicSettingsActivity extends AppCompatActivity {
             nameOfTrack.setEnabled(true);
             labelAudio.setEnabled(true);
             mediaPlayer.release();
+
             createMediaPlayer();
+            startSeekBar = 0;
+            Uri uri = Uri.parse(musicPreferences.getString("ringtonePath",""));
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(getApplicationContext(),uri);
+            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            int millSecond = Integer.parseInt(durationStr);
+            endSeekBar = millSecond;
             setRangesOfSeekBar();
 
         }

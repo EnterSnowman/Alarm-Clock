@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,7 +71,16 @@ public class ListOfTimesActivity extends AppCompatActivity {
 
     protected Dialog onCreateDialog(int id){
         if (id==TIME_DIALOG){
-            TimePickerDialog timePickerDialog =new TimePickerDialog(this,alarmCallBack, Calendar.getInstance().getTime().getHours(),Calendar.getInstance().getTime().getMinutes(),true);
+            final TimePickerDialog timePickerDialog =new TimePickerDialog(this,alarmCallBack, Calendar.getInstance().getTime().getHours(),Calendar.getInstance().getTime().getMinutes(),true);
+            timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancelLabel), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (i == DialogInterface.BUTTON_NEGATIVE)
+                    {
+                       timePickerDialog.dismiss();
+                    }
+                }
+            });
             return timePickerDialog;
         }
         return super.onCreateDialog(id);
@@ -77,6 +88,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
 
     TimePickerDialog.OnTimeSetListener alarmCallBack = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            if (view.isShown()){
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(Integer.toString(hourOfDay)+":"+Integer.toString(minute),true);
             editor.commit();
@@ -84,10 +96,13 @@ public class ListOfTimesActivity extends AppCompatActivity {
             intent.setAction(Integer.toString(hourOfDay)+":"+Integer.toString(minute));
             PendingIntent pendingIntent = PendingIntent.getBroadcast(ListOfTimesActivity.this,0,intent,0);
             Calendar calendar = Calendar.getInstance();
+            int day = 0;
             calendar.setTimeInMillis(System.currentTimeMillis());
+            if ((hourOfDay<calendar.getTime().getHours())||(hourOfDay==calendar.getTime().getHours()&&minute<calendar.getTime().getMinutes()))
+                day = 24*60*60*1000;
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()-60*1000,AlarmManager.INTERVAL_DAY,pendingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()-60*1000+day,AlarmManager.INTERVAL_DAY,pendingIntent);
             alarms = new ArrayList<Alarm>();
             Map<String,Boolean> tmp = (Map<String, Boolean>) sharedPreferences.getAll();
             for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
@@ -96,6 +111,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
             timesAdapter.setAlarms(alarms);
             timesAdapter.notifyDataSetChanged();
         }
+}
     };
 
     @Override

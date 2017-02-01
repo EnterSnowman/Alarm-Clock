@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Будильник</string>
+    <string name="action_settings">Настройки</string>
+    <string name="ringtone_settings">Настройки мелодії</string>
+</resources>

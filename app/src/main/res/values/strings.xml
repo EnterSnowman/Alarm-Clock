@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Alarm Clock</string>
     <string name="action_settings">Settings</string>
+    <string name="ringtone_settings">Ringtone settings</string>
+    <string name="choose_ringtone">Choose a ringtone</string>
+    <string name="typeOfRingtoneLabel">Type of ringtone</string>
+    <string name="defaultLabel">Default</string>
+    <string name="otherLabel">Other...</string>
+    <string name="getOtherRingtoneLabel">Get other ringtones</string>
+    <string name="ringtoneLabel">Ringtone</string>
+    <string name="rangesLabel">Set ranges of playing</string>
+    <string name="cancelLabel">Cancel</string>
 </resources>

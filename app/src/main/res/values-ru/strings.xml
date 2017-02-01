@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Будильник</string>
+    <string name="action_settings">Настройки</string>
+    <string name="ringtone_settings">Настройки мелодии</string>
+    <string name="choose_ringtone">Выберите мелодию</string>
+    <string name="defaultLabel">Стандартная</string>
+    <string name="getOtherRingtoneLabel">Выбрать другую мелодию</string>
+    <string name="otherLabel">Другая...</string>
+    <string name="rangesLabel">Изменить границы проигрывания</string>
+    <string name="ringtoneLabel">Мелодия</string>
+    <string name="typeOfRingtoneLabel">Тип мелодии</string>
+    <string name="cancelLabel">Отмена</string>
+</resources>

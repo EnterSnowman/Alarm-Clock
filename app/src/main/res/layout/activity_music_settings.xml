@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/textColorName"
         android:textSize="18sp"
-        android:text="Type of ringtone"/>
+        android:text="@string/typeOfRingtoneLabel"/>
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,22 +25,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/defaultRingtone"
-            android:text="Default"/>
+            android:text="@string/defaultLabel"/>
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/otherRingtone"
-            android:text="Other..."/>
+            android:text="@string/otherLabel"/>
     </RadioGroup>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/setRingtoneButton"
-        android:text="Get other ringtones"/>
+        android:text="@string/getOtherRingtoneLabel"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Audiotrack"
+        android:text="@string/ringtoneLabel"
         android:textColor="@color/textColorName"
         android:id="@+id/labelAudio"
         android:textSize="18sp"/>
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/textColorName"
         android:textSize="18sp"
-        android:text="Set range of playing"/>
+        android:text="@string/rangesLabel"/>
 
 
 
