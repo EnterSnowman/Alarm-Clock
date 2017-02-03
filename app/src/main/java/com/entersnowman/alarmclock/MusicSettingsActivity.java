@@ -94,7 +94,6 @@ public class MusicSettingsActivity extends AppCompatActivity {
         otherRingtonesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isPause)
                     stop();
                 startActivityForResult(new Intent(MusicSettingsActivity.this, ListOfRingtonesActivity.class),LIST_OF_RINGTONES);
             }
@@ -111,13 +110,14 @@ public class MusicSettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 switch (i){
                     case  R.id.defaultRingtone:
-                    musicPreferences.edit().putString("typeOfRingtone","default").commit();
+                    musicPreferences.edit().putBoolean("isOtherRingtone",false).commit();
+                        createMediaPlayer();
                         otherRingtonesButton.setEnabled(false);
                         nameOfTrack.setEnabled(false);
                         labelAudio.setEnabled(false);
                         break;
                     case R.id.otherRingtone:
-                        musicPreferences.edit().putString("typeOfRingtone","other").commit();
+                        musicPreferences.edit().putBoolean("isOtherRingtone",true).commit();
                         if (!musicPreferences.getBoolean("isOtherRingtone", false)) {
                             startActivityForResult(new Intent(MusicSettingsActivity.this, ListOfRingtonesActivity.class),LIST_OF_RINGTONES);
                         }
@@ -125,14 +125,14 @@ public class MusicSettingsActivity extends AppCompatActivity {
                         otherRingtonesButton.setEnabled(true);
                         nameOfTrack.setEnabled(true);
                         labelAudio.setEnabled(true);
+                            createMediaPlayer();
                         }
                         break;
                 }
             }
         });
-        if (musicPreferences.getString("typeOfRingtone","default").equals("default")){
+        if (!musicPreferences.getBoolean("isOtherRingtone",false)){
             RadioButton radioButton = (RadioButton) findViewById(R.id.defaultRingtone);
-            musicPreferences.edit().putString("typeOfRingtone","default").commit();
             otherRingtonesButton.setEnabled(false);
             nameOfTrack.setEnabled(false);
             labelAudio.setEnabled(false);
@@ -140,7 +140,6 @@ public class MusicSettingsActivity extends AppCompatActivity {
         }
         else {
             RadioButton radioButton = (RadioButton) findViewById(R.id.otherRingtone);
-            musicPreferences.edit().putString("typeOfRingtone","other").commit();
             nameOfTrack.setEnabled(true);
             labelAudio.setEnabled(true);
             radioButton.setChecked(true);
@@ -151,19 +150,7 @@ public class MusicSettingsActivity extends AppCompatActivity {
 
 
     public void start(){
-        if (isPause){
-            mediaPlayer.start();
-        }
-        else{
-        mediaPlayer.prepareAsync();
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.seekTo(0);
-                mp.start();
-            }
-        });
-        }
+        mediaPlayer.start();
         startBtn.setEnabled(false);
         pauseBtn.setEnabled(true);
         isPause = false;
@@ -179,7 +166,15 @@ public class MusicSettingsActivity extends AppCompatActivity {
     public void stop(){
         isPause = false;
         mediaPlayer.stop();
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.seekTo(0);
+            }
+        });
         startBtn.setEnabled(true);
+        pauseBtn.setEnabled(false);
     }
 
     public void createMediaPlayer(){
@@ -190,8 +185,10 @@ public class MusicSettingsActivity extends AppCompatActivity {
             mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
             try {
-                mediaPlayer.setDataSource(this, Uri.parse(musicPreferences.getString("ringtonePath","")));
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mediaPlayer.setDataSource(this, Uri.parse(musicPreferences.getString("ringtonePath","")));
+                mediaPlayer.prepareAsync();
+                Log.d("music","SetDataSource "+Uri.parse(musicPreferences.getString("ringtonePath","")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -210,7 +207,6 @@ public class MusicSettingsActivity extends AppCompatActivity {
             nameOfTrack.setEnabled(true);
             labelAudio.setEnabled(true);
             mediaPlayer.release();
-
             createMediaPlayer();
             startSeekBar = 0;
             Uri uri = Uri.parse(musicPreferences.getString("ringtonePath",""));
@@ -219,6 +215,7 @@ public class MusicSettingsActivity extends AppCompatActivity {
             String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             int millSecond = Integer.parseInt(durationStr);
             endSeekBar = millSecond;
+            mmr.release();
             setRangesOfSeekBar();
 
         }
@@ -242,22 +239,24 @@ public class MusicSettingsActivity extends AppCompatActivity {
     }
 
     public void setRangesOfSeekBar(){
-        Log.d("music","setRanges");
-        Uri uri = Uri.parse(musicPreferences.getString("ringtonePath",""));
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(getApplicationContext(),uri);
-        String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        int millSecond = Integer.parseInt(durationStr);
-        mediaPlayerDuration = mediaPlayer.getDuration();
-        correctDuration =millSecond;
-        Log.d("music","Dur = "+ String.valueOf(millSecond));
-        Log.d("music","setMinMax");
-        crystalRangeSeekbar.setMinValue(0);
-        crystalRangeSeekbar.setMaxValue(millSecond);
-        Log.d("music","setSelectedMinMax");
-        crystalRangeSeekbar.setMinStartValue(startSeekBar).setMaxStartValue(endSeekBar).apply();
-        leftRange.setText( millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMinValue().intValue()));
-        rightRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMaxValue().intValue()));
-
+        if (musicPreferences.contains("ringtonePath")) {
+            Log.d("music", "setRanges");
+            Uri uri = Uri.parse(musicPreferences.getString("ringtonePath", ""));
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(getApplicationContext(), uri);
+            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            int millSecond = Integer.parseInt(durationStr);
+            mmr.release();
+            mediaPlayerDuration = mediaPlayer.getDuration();
+            correctDuration = millSecond;
+            Log.d("music", "Dur = " + String.valueOf(millSecond));
+            Log.d("music", "setMinMax");
+            crystalRangeSeekbar.setMinValue(0);
+            crystalRangeSeekbar.setMaxValue(millSecond);
+            Log.d("music", "setSelectedMinMax");
+            crystalRangeSeekbar.setMinStartValue(startSeekBar).setMaxStartValue(endSeekBar).apply();
+            leftRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMinValue().intValue()));
+            rightRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMaxValue().intValue()));
+        }
     }
 }

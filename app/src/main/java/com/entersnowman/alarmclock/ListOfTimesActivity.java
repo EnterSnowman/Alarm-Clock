@@ -28,6 +28,7 @@ import java.util.Map;
 
 public class ListOfTimesActivity extends AppCompatActivity {
     final  static int TIME_DIALOG = 1;
+    public final static String ALARM_ACTION= "com.entersnowman.alarm";
     SharedPreferences sharedPreferences;
     SharedPreferences musicPreferences;
     ArrayList<Alarm> alarms;
@@ -93,7 +94,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
             editor.putBoolean(Integer.toString(hourOfDay)+":"+Integer.toString(minute),true);
             editor.commit();
             Intent intent  = new Intent(ListOfTimesActivity.this,AlarmReceiver.class);
-            intent.setAction(Integer.toString(hourOfDay)+":"+Integer.toString(minute));
+            intent.setAction(ALARM_ACTION+Integer.toString(hourOfDay)+":"+Integer.toString(minute));
             PendingIntent pendingIntent = PendingIntent.getBroadcast(ListOfTimesActivity.this,0,intent,0);
             Calendar calendar = Calendar.getInstance();
             int day = 0;
