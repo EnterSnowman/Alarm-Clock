@@ -6,5 +6,6 @@
     <color name="textColorName">#000000</color>
     <color name="textColorArtist">#424242</color>
     <color name="endColorButton">#7986CB</color>
+    <color name="disabledColorButton">#9fa8da</color>
     <color name="centerColorButton">#5C6BC0</color>
 </resources>
