@@ -150,6 +150,7 @@ public class MusicSettingsActivity extends AppCompatActivity {
 
 
     public void start(){
+        mediaPlayer.seekTo(musicPreferences.getInt("startSeekBar",0));
         mediaPlayer.start();
         startBtn.setEnabled(false);
         pauseBtn.setEnabled(true);
@@ -170,7 +171,7 @@ public class MusicSettingsActivity extends AppCompatActivity {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.seekTo(0);
+                mediaPlayer.seekTo(musicPreferences.getInt("startSeekBar",0));
             }
         });
         startBtn.setEnabled(true);
