@@ -2,4 +2,13 @@
     <string name="app_name">Будильник</string>
     <string name="action_settings">Настройки</string>
     <string name="ringtone_settings">Настройки мелодії</string>
+    <string name="alarmLabel">Прокидайся!</string>
+    <string name="cancelLabel">Скасувати</string>
+    <string name="choose_ringtone">Виберіть мелодію</string>
+    <string name="defaultLabel">Стандартна</string>
+    <string name="getOtherRingtoneLabel">Виберіть іншу мелодію</string>
+    <string name="otherLabel">Інша...</string>
+    <string name="rangesLabel">Змінити межі програвання</string>
+    <string name="ringtoneLabel">Мелодія</string>
+    <string name="typeOfRingtoneLabel">Тип мелодії</string>
 </resources>

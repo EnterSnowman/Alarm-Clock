@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TimePicker;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
     ArrayList<Alarm> alarms;
     RecyclerView recyclerView;
     TimesAdapter timesAdapter;
+    Button test;
     AlarmManager alarmManager;
 
     @Override
@@ -43,6 +45,13 @@ public class ListOfTimesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         alarms = new ArrayList<Alarm>();
+        test = (Button) findViewById(R.id.test);
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ListOfTimesActivity.this,AlarmActivity.class));
+            }
+        });
         recyclerView = (RecyclerView) findViewById(R.id.listOfTimes);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);

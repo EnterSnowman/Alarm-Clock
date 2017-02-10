@@ -34,7 +34,6 @@ public class AlarmActivity extends AppCompatActivity{
                 Log.d("music", String.valueOf(mediaPlayer.getCurrentPosition()));
                 //loopRingTask.cancel(true);
                 mediaPlayer.stop();
-                mediaPlayer.release();
                 stopAlarm.setEnabled(false);
             }
         });
@@ -78,9 +77,11 @@ public class AlarmActivity extends AppCompatActivity{
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("music","CurPos = "+mediaPlayer.getCurrentPosition());
+                            if (mediaPlayer.isPlaying()){
                             publishProgress(mediaPlayer.getCurrentPosition());
-                            if (isUpdate)
+                            Log.d("music","CurPos = "+mediaPlayer.getCurrentPosition());
+                            }
+                            if (isUpdate&&mediaPlayer.isPlaying())
                                 handler.postDelayed(this, 500);
                         }
                     };

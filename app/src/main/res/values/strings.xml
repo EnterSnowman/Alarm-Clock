@@ -10,4 +10,5 @@
     <string name="ringtoneLabel">Ringtone</string>
     <string name="rangesLabel">Set ranges of playing</string>
     <string name="cancelLabel">Cancel</string>
+    <string name="alarmLabel">Wake Up!</string>
 </resources>
