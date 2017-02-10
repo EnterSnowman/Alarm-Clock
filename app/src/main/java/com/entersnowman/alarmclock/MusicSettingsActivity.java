@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -44,6 +45,8 @@ public class MusicSettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_settings);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeAsUpIndicator();
         musicPreferences = getSharedPreferences("listOfMusicPreferences",MODE_PRIVATE);
         otherRingtonesButton = (Button) findViewById(R.id.setRingtoneButton);
         leftRange = (TextView) findViewById(R.id.leftRange);
@@ -259,5 +262,16 @@ public class MusicSettingsActivity extends AppCompatActivity {
             leftRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMinValue().intValue()));
             rightRange.setText(millisToMinutesAndSeconds(crystalRangeSeekbar.getSelectedMaxValue().intValue()));
         }
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

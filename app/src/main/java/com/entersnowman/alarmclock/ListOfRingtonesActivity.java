@@ -29,6 +29,7 @@ public class ListOfRingtonesActivity extends AppCompatActivity {
         listOfRingtones.setLayoutManager(new LinearLayoutManager(this));
         listOfRingtones.setAdapter(ringtoneAdapter);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_close);
 
     }
 
