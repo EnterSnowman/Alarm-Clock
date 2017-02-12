@@ -22,8 +22,11 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TimePicker;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 
@@ -37,7 +40,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
     TimesAdapter timesAdapter;
     Button test;
     AlarmManager alarmManager;
-
+    Comparator<Alarm> alarmComparator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,27 @@ public class ListOfTimesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         alarms = new ArrayList<Alarm>();
+        alarmComparator =  new Comparator<Alarm>() {
+            @Override
+            public int compare(Alarm o1, Alarm o2) {
+                if (o1.getHour() ==  o2.getHour() && o1.getMinute() == o2.getMinute())
+                    return  0;
+                else {
+                    if (o1.getHour() ==  o2.getHour()){
+                        if ( o1.getMinute() > o2.getMinute())
+                            return 1;
+                        else
+                            return -1;
+                    }
+                    else {
+                        if (o1.getHour() >  o2.getHour())
+                            return 1;
+                        else
+                            return -1;
+                    }
+                }
+            }
+        };
         test = (Button) findViewById(R.id.test);
         test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +96,7 @@ public class ListOfTimesActivity extends AppCompatActivity {
         for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
             alarms.add(new Alarm(entry.getValue(),Integer.valueOf(entry.getKey().split(":")[0]),Integer.valueOf(entry.getKey().split(":")[1])));
         }
-
+        Collections.sort(alarms,alarmComparator);
         timesAdapter = new TimesAdapter(alarms,this);
         recyclerView.setAdapter(timesAdapter);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -103,7 +127,12 @@ public class ListOfTimesActivity extends AppCompatActivity {
             editor.putBoolean(Integer.toString(hourOfDay)+":"+Integer.toString(minute),true);
             editor.commit();
             Intent intent  = new Intent(ListOfTimesActivity.this,AlarmReceiver.class);
+            String sminute = Integer.toString(minute);
+            String shour = Integer.toString(hourOfDay);
+            if (minute<10)
+                sminute = "0"+sminute;
             intent.setAction(ALARM_ACTION+Integer.toString(hourOfDay)+":"+Integer.toString(minute));
+            intent.putExtra("time",shour+":"+sminute);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(ListOfTimesActivity.this,0,intent,0);
             Calendar calendar = Calendar.getInstance();
             int day = 0;
@@ -112,12 +141,14 @@ public class ListOfTimesActivity extends AppCompatActivity {
                 day = 24*60*60*1000;
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()-60*1000+day,AlarmManager.INTERVAL_DAY,pendingIntent);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+day,AlarmManager.INTERVAL_DAY,pendingIntent);
             alarms = new ArrayList<Alarm>();
             Map<String,Boolean> tmp = (Map<String, Boolean>) sharedPreferences.getAll();
             for (Map.Entry<String,Boolean> entry: tmp.entrySet()){
                 alarms.add(new Alarm(entry.getValue(),Integer.valueOf(entry.getKey().split(":")[0]),Integer.valueOf(entry.getKey().split(":")[1])));
             }
+            Collections.sort(alarms,alarmComparator);
             timesAdapter.setAlarms(alarms);
             timesAdapter.notifyDataSetChanged();
         }

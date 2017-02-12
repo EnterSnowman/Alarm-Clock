@@ -11,12 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.IOException;
 
 public class AlarmActivity extends AppCompatActivity{
     AudioManager audioManager;
     MediaPlayer mediaPlayer;
+    TextView timeView;
     Button stopAlarm;
     SharedPreferences musicPrefs;
     LoopRingTask loopRingTask;
@@ -25,8 +27,10 @@ public class AlarmActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
         stopAlarm = (Button) findViewById(R.id.stopAlarm);
+        timeView = (TextView) findViewById(R.id.time);
+        timeView.setText(getIntent().getStringExtra("time"));
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2,0);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),0);
         musicPrefs = getSharedPreferences("listOfMusicPreferences",MODE_PRIVATE);
         stopAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
